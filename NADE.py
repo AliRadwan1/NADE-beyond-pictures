@@ -71,8 +71,11 @@ class NADE(nn.Module):
         Returns:
             torch.Tensor: Generated binary samples of shape (num_samples, D).
         """
-        memory = self.c.repeat(num_samples, 1)
-        samples = torch.zeros(num_samples, self.D)
+        # Detect which device the model weights are currently on
+        device = self.W.device
+        
+        samples = torch.zeros((num_samples, self.D), device=device)
+        memory = self.c.unsqueeze(0).expand(num_samples, -1) # ensure memory is on same device
         
         for i in range(self.D):
             # Compute hidden state and prediction probability for pixel i
